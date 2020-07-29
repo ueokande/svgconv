@@ -39,6 +39,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-svg": "^5.0.0",
     "@types/styled-components": "^5.1.1",
     "@typescript-eslint/eslint-plugin": "^3.7.1",
     "@typescript-eslint/parser": "^3.7.1",
@@ -49,6 +50,7 @@
     "eslint-plugin-react-hooks": "^4.0.8",
     "eslint-plugin-typescript": "^0.14.0",
     "prettier": "^2.0.5",
+    "react-svg": "^11.0.32",
     "styled-components": "^5.1.1"
   }
 }
