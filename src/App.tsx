@@ -1,6 +1,7 @@
 import React from "react";
 import Template from "./Template";
 import styled from "styled-components";
+import { ColorResult, SketchPicker } from "react-color";
 
 const Container = styled.div`
   text-align: center;
@@ -14,9 +15,11 @@ const App = () => {
   const [title, setTitle] = React.useState("Hello, world");
   const handleTitleChanged = (e: React.ChangeEvent<HTMLInputElement>) =>
     setTitle(e.target.value);
-
+  const [initialized, setInitialized] = React.useState(false);
   const canvas = React.createRef<HTMLCanvasElement>();
   const img = React.createRef<HTMLImageElement>();
+  const screen = React.createRef<HTMLImageElement>();
+  const [color, setColor] = React.useState("#3abbd7ff");
 
   React.useEffect(() => {
     if (img.current === null) {
@@ -33,46 +36,67 @@ const App = () => {
   }, [title, canvas, img]);
 
   React.useEffect(() => {
-    const dpr = window.devicePixelRatio || 1;
-    if (canvas.current === null) {
-      return;
-    }
-
-    const react = canvas.current.getBoundingClientRect();
-    canvas.current.width = react.width * dpr;
-    canvas.current.height = react.height * dpr;
-  }, [canvas]);
-
-  React.useEffect(() => {
     if (img.current === null) {
       return;
     }
     img.current.onload = () => {
-      if (img.current === null) {
+      if (img.current === null || screen.current === null || canvas.current === null) {
         return;
       }
       const ctx = canvas.current?.getContext("2d");
       ctx?.drawImage(img.current, 0, 0);
+
+      screen.current.src = canvas.current.toDataURL();
     };
-  }, [img]);
+  }, [img, canvas, screen]);
+
+  const handleOnLoadSvg = () => {
+    if (!initialized) {
+      setTitle("Title here");
+      setInitialized(true);
+    }
+  };
+  const handleColorChanged = (color: ColorResult) => {
+    setColor(color.hex);
+  };
 
   return (
-    <Container>
-      <canvas ref={canvas} style={{ width: "1920px", height: "1080px" }} />
-      <Hidden>
-        <Template title={title} />
-        <img alt="dummy" ref={img} />
-      </Hidden>
-      <label>
-        <input
-          type="text"
-          name="title"
-          value={title}
-          placeholder="Title"
-          onChange={handleTitleChanged}
-        />
-      </label>
-    </Container>
+    <>
+      <Container>
+        <img ref={screen} width={330} height={135} />
+        <br />
+        <Hidden>
+          <canvas
+            ref={canvas}
+            width={660}
+            height={270}
+            style={{ width: "330px", height: "135px" }}
+          />
+          <Template title={title} color={color} onLoad={handleOnLoadSvg} />
+          <img alt="dummy" ref={img} />
+        </Hidden>
+        <label>
+          Title:
+          <input
+            type="text"
+            name="title"
+            value={title}
+            placeholder="Title"
+            onChange={handleTitleChanged}
+          />
+        </label>
+        <br />
+
+        <label>
+          Color:
+          <SketchPicker
+            color={color}
+            disableAlpha={true}
+            onChange={handleColorChanged}
+          />
+        </label>
+      </Container>
+    </>
   );
 };
 
